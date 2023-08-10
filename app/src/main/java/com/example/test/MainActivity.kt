@@ -14,78 +14,87 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.semantics.Role.Companion.Image
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import coil.compose.rememberImagePainter
-import com.example.test.ui.theme.TestTheme
+import coil.compose.rememberAsyncImagePainter
+import com.intuit.sdp.R
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
 //        val cm = CategoryViewModel()
         super.onCreate(savedInstanceState)
-        Log.v("myLog","onCreate")
+        Log.v("myLog", "onCreate")
         setContent {
             MaterialTheme {
                 CategoryScreen()
             }
         }
     }
+
     @Preview(showBackground = true)
     @Composable
     private fun CategoryScreen() {
-        Log.v("myLog","CategoryScreen-->start")
+        Log.v("myLog", "CategoryScreen-->start")
         val viewModel: CategoryViewModel = viewModel()
         viewModel.getCategories()
-        Log.v("myLog","CategoryScreen-->afterApicall")
-        val categories: List<Category> =viewModel.categoryList
+        Log.v("myLog", "CategoryScreen-->afterApicall")
+        val categories: List<Category> = viewModel.categoryList
         Log.v("myLog", "CategoryScreen-->categories-->$categories")
         LazyColumn(
-            modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(16.dp)
+            modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(getSdp(R.dimen._16sdp))
         ) {
             items(categories) { category ->
-                Log.v("myLog","CategoryItem-->start-->${category.subCategory}")
+                Log.v("myLog", "CategoryItem-->start-->${category.subCategory}")
                 CategoryItem(category)
-                Log.v("myLog","CategoryItem-->start-->${category.subCategory}")
+                Log.v("myLog", "CategoryItem-->start-->${category.subCategory}")
             }
         }
 
     }
-
+    @Composable
+    fun getSdp(value :Int) : Dp{
+        return dimensionResource(id = value)
+    }
     @Composable
     fun CategoryItem(category: Category) {
-        Log.v("myLog","CategoryItem-->start-->$category")
+        Log.v("myLog", "CategoryItem-->start-->$category")
         Column(
-            modifier = Modifier.fillMaxWidth().padding(8.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp)
         ) {
             Text(text = category.name, style = MaterialTheme.typography.h6)
-            Spacer(modifier = Modifier.height(8.dp))
-            category.subCategory.forEach{subCategory ->
+            Spacer(modifier = Modifier.height(getSdp(R.dimen._8sdp)))
+            category.subCategory.forEach { subCategory ->
                 SubCategoryItem(subCategory)
-                Log.v("myLog","CategoryItem-->end-->$subCategory")
+                Log.v("myLog", "CategoryItem-->end-->$subCategory")
             }
         }
     }
 
     @Composable
     fun SubCategoryItem(subCategory: SubCategory) {
-        Log.v("myLog","subCategory-->start-->$subCategory")
+        Log.v("myLog", "subCategory-->start-->$subCategory")
         Row(
-            modifier = Modifier.fillMaxWidth().padding(8.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Image(
-                painter = rememberImagePainter(subCategory.icon),
+                painter = rememberAsyncImagePainter(subCategory.icon),
                 contentDescription = null,
-                modifier = Modifier.size(32.dp),
+                modifier = Modifier.size(getSdp(R.dimen._32sdp)),
                 contentScale = ContentScale.FillBounds
             )
-            Spacer(modifier = Modifier.width(8.dp))
+            Spacer(modifier = Modifier.width(getSdp(R.dimen._8sdp)))
             Text(text = subCategory.name)
         }
     }
 
-        private fun viewModel(): CategoryViewModel {
-            return CategoryViewModel()
-        }
+    private fun viewModel(): CategoryViewModel {
+        return CategoryViewModel()
     }
+}

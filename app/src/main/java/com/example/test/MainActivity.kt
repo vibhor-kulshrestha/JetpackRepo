@@ -8,9 +8,13 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -28,30 +32,43 @@ class MainActivity : ComponentActivity() {
         Log.v("myLog", "onCreate")
         setContent {
             MaterialTheme {
-                CategoryScreen()
+                val viewModel: CategoryViewModel = viewModel()
+                CategoryScreen(viewModel)
             }
         }
     }
 
-    @Preview(showBackground = true)
     @Composable
-    private fun CategoryScreen() {
+    private fun CategoryScreen(viewModel: CategoryViewModel) {
         Log.v("myLog", "CategoryScreen-->start")
-        val viewModel: CategoryViewModel = viewModel()
-        viewModel.getCategories()
-        Log.v("myLog", "CategoryScreen-->afterApicall")
+
+        Log.v("myLog","isLoading2-->" + viewModel.isLoading.value)
+//        val isLoading = remember {
+//            mutableStateOf(viewModel.isLoading.value)
+//        }
+        LaunchedEffect(key1 = Unit){
+            viewModel.getCategories()
+        }
+
         val categories: List<Category> = viewModel.categoryList
-        Log.v("myLog", "CategoryScreen-->categories-->$categories")
         LazyColumn(
             modifier = Modifier.fillMaxSize(), contentPadding = PaddingValues(getSdp(R.dimen._16sdp))
         ) {
             items(categories) { category ->
-                Log.v("myLog", "CategoryItem-->start-->${category.subCategory}")
                 CategoryItem(category)
-                Log.v("myLog", "CategoryItem-->start-->${category.subCategory}")
             }
         }
-
+        if(viewModel.isLoading.value){
+            LoadingIndicator()
+        }
+    }
+    @Composable
+    fun LoadingIndicator(){
+        Box(modifier = Modifier
+            .fillMaxSize(), contentAlignment = Alignment.Center
+            ){
+            CircularProgressIndicator()
+        }
     }
     @Composable
     fun getSdp(value :Int) : Dp{
@@ -59,7 +76,6 @@ class MainActivity : ComponentActivity() {
     }
     @Composable
     fun CategoryItem(category: Category) {
-        Log.v("myLog", "CategoryItem-->start-->$category")
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -69,14 +85,12 @@ class MainActivity : ComponentActivity() {
             Spacer(modifier = Modifier.height(getSdp(R.dimen._8sdp)))
             category.subCategory.forEach { subCategory ->
                 SubCategoryItem(subCategory)
-                Log.v("myLog", "CategoryItem-->end-->$subCategory")
             }
         }
     }
 
     @Composable
     fun SubCategoryItem(subCategory: SubCategory) {
-        Log.v("myLog", "subCategory-->start-->$subCategory")
         Row(
             modifier = Modifier
                 .fillMaxWidth()

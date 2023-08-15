@@ -5,6 +5,7 @@ import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -76,15 +77,20 @@ class MainActivity : ComponentActivity() {
     }
     @Composable
     fun CategoryItem(category: Category) {
+        val subCatVisible = remember {
+            mutableStateOf(true)
+        }
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(8.dp)
         ) {
-            Text(text = category.name, style = MaterialTheme.typography.h6)
+            Text(text = category.name, modifier = Modifier.clickable { subCatVisible.value = !subCatVisible.value }, style = MaterialTheme.typography.h6)
             Spacer(modifier = Modifier.height(getSdp(R.dimen._8sdp)))
-            category.subCategory.forEach { subCategory ->
-                SubCategoryItem(subCategory)
+            if(subCatVisible.value) {
+                category.subCategory.forEach { subCategory ->
+                    SubCategoryItem(subCategory)
+                }
             }
         }
     }
